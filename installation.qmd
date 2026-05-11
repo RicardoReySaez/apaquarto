@@ -210,6 +210,13 @@ If the quarto package is not installed, you can can install it by running this c
 install.packages("quarto")
 ```
 
+The example document includes executable R chunks. To render it as-is, install the example packages first:
+
+```{r installexamplepackages}
+#| eval: false
+install.packages(c("conflicted", "tidyverse", "flextable", "ftExtra", "apa7", "knitr", "tinytable", "snakecase"))
+```
+
 Alternatively, in RStudio's lower right pane:
 
 1. Select the **Packages** tab.

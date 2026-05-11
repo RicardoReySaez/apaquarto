@@ -56,6 +56,13 @@ running this code in the console:
 install.packages("quarto")
 ```
 
+The example document includes executable R chunks. To render it as-is,
+install the example packages first:
+
+``` r
+install.packages(c("conflicted", "tidyverse", "flextable", "ftExtra", "apa7", "knitr", "tinytable", "snakecase"))
+```
+
 Once the quarto package is installed, you can install a quarto extension
 template by setting your working directory to the folder where you want
 the template to be installed (e.g., `setwd("path/to/my/folder")`) and

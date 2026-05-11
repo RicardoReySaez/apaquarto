@@ -19,6 +19,10 @@ contributes:
       number-depth: 3
       crossref:
         subref-labels: alpha A
+      supplementary-material: false
+      supplementary-float-prefix: true
+      supplementary-section-prefix: true
+      publication-statement: false
       suppress-title-page: false
       suppress-title-page-number: false
       suppress-title: false
@@ -53,8 +57,8 @@ contributes:
         figure-table-note: "Note"
         title-block-author-note: "Author Note"
         title-block-correspondence-note: "Correspondence concerning this article should be addressed to"
-        title-block-role-introduction: "Author roles were classified using the Contributor Role Taxonomy (CRediT; https://credit.niso.org/) as follows:"
-        title-impact-statement: "Impact Statement"
+        title-block-role-introduction: "Author roles were classified using the Contributor Role Taxonomy (CRediT; <https://credit.niso.org/>) as follows:"
+        title-impact-statement: "Translational Abstract"
         title-word-count: "Word Count"
         references-meta-analysis: "References marked with an asterisk indicate studies included in the meta-analysis."
       filters:

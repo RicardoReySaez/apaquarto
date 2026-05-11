@@ -357,7 +357,7 @@ create_apaquarto_qmd <- function(contributors_table, file = "apaquarto_paper.qmd
       `title-block-author-note` = "Author Note",
       `title-block-correspondence-note` = "Correspondence concerning this article should be addressed to",
       `title-block-role-introduction` = "Author roles were classified using the Contributor Role Taxonomy (CRediT; [credit.niso.org](https://credit.niso.org)) as follows:",
-      `title-impact-statement` = "Impact Statement",
+      `title-impact-statement` = "Translational Abstract",
       `references-meta-analysis` = "References marked with an asterisk indicate studies included in the meta-analysis."
     ),
     `no-ampersand-parenthetical` = FALSE,

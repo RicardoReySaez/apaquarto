@@ -7,6 +7,8 @@ div.Author p {
 .FigureTitle {font-weight: bold; margin: 5pt 0; font-size: 12pt; color: black;}
 .FigureTitle p {text-indent: 0; text-align: left;}
 .FigureNote p {text-indent: 0; margin: 0; padding: 0}
+.PublicationStatement p {text-indent: 0}
+.page-break {break-after: page; page-break-after: always}
 .Caption {font-style: italic; font-size: 12pt; color: black; text-align: left}
 .Caption p {text-indent: 0; font-size: 12pt;}
 .quarto-float, .quarto-float-tbl, .figure {margin: 0; margin-block-start: 0; margin-block-end: 0; margin-block-start: 0; margin-inline-start: 0; margin-inline-end: 0}

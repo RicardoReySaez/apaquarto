@@ -2,6 +2,20 @@
 title: "Write APA Style Documents Using Quarto"
 # If blank, the running header is the title in upper case.
 shorttitle: "Template for the apaquarto Extension"
+# If true, the title page is formatted for supplementary material and the running head becomes "Supplementary Material".
+supplementary-material: false
+# These are enabled automatically when supplementary-material is true; set either to false to disable.
+# supplementary-float-prefix: true
+# supplementary-section-prefix: true
+# Optional publication statement for accepted manuscripts.
+# publication-statement:
+#   journal: Psychological Methods
+#   apa-year: 2026
+#   doi: "https://doi.org/10.1037/met0000846"
+# Add custom wording after the standard accepted-in-journal sentence:
+# publication-statement:
+#   journal: Psychological Methods
+#   statement: "Custom publication wording..."
 # Set names and affiliations.
 # It is nice to specify everyone's orcid, if possible.
 # There can be only one corresponding author, but declaring one is optional.
@@ -12,7 +26,7 @@ author:
     email: sm@example.org
     url: https://example.org/
     # Roles are optional. 
-    # Select from the CRediT: Contributor Roles Taxonomy https://credit.niso.org/
+    # Select from the CRediT: Contributor Roles Taxonomy <https://credit.niso.org/>
     # conceptualization, data curation, formal analysis, funding acquisition, investigation, 
     # methodology, project administration, resources, software, supervision, validation, 
     # visualization, writing, editing
@@ -82,6 +96,8 @@ author-note:
     gratitude: ~
     # Example. Because the authors are equal contributors, order of authorship was determined by a fair coin toss.
     authorship-agreements: ~
+    # Example: The authors used AI tools to improve grammar and clarity and reviewed all generated text.
+    ai-statement: "The authors used AI tools to improve grammar and clarity and reviewed all generated text."
 abstract: "This document is a template demonstrating the apaquarto format. The template demonstrates the use of in-text citations, possessive citations, masked citations, meta-analytpic citations, block quotes, equations, figures, and tables. Creating appendices is demonstrated."
 # Put as many keywords at you like
 keywords: 
@@ -129,8 +145,8 @@ language:
   email: "Email"
   title-block-author-note: "Author Note"
   title-block-correspondence-note: "Correspondence concerning this article should be addressed to"
-  title-block-role-introduction: "Author roles were classified using the Contributor Role Taxonomy (CRediT; [credit.niso.org](https://credit.niso.org)) as follows:"
-  title-impact-statement: "Impact Statement"
+  title-block-role-introduction: "Author roles were classified using the Contributor Role Taxonomy (CRediT; <https://credit.niso.org/>) as follows:"
+  title-impact-statement: "Translational Abstract"
   references-meta-analysis: "References marked with an asterisk indicate studies included in the meta-analysis."
 # Keep `false` to remain consistent with APA style. If `true`, replaces ampersands with `and` or word specified in `citation-last-author-separator` in parenthetical citations. 
 no-ampersand-parenthetical: false
@@ -162,6 +178,7 @@ library(ftExtra)
 library(apa7)
 library(knitr)
 library(tinytable)
+library(snakecase)
 conflicts_prefer(dplyr::filter, .quiet = TRUE)
 conflicts_prefer(flextable::separate_header, .quiet = TRUE)
 conflicts_prefer(ggplot2::theme_void, .quiet = TRUE)

@@ -1,7 +1,6 @@
 $doc-class.tex()$
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{setspace}
 $if(docmode)$
 \geometry{inner=1in, outer=1in}
 \fancyhfoffset[LE,RO]{0cm}
@@ -39,9 +38,6 @@ $endif$
 
 \RequirePackage{longtable}
 \RequirePackage{threeparttablex}
-
-\usepackage{framed}
-
 
 $header.tex()$
 
@@ -182,6 +178,16 @@ $endif$
 
 \urlstyle{same}
 
+$if(supplementaryfloatprefix)$
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+\makeatletter
+\apptocmd{\appendix}
+  {\renewcommand{\thefigure}{S\arabic{figure}}\renewcommand{\thetable}{S\arabic{table}}}
+  {}{}
+\makeatother
+$endif$
+
 
 $for(header-insert)$
 $header-insert$
@@ -190,6 +196,10 @@ $endfor$
 $for(header-includes)$
 $header-includes$
 $endfor$
+
+\makeatletter
+\AtBeginDocument{\@ifpackageloaded{ulem}{\normalem}{}}
+\makeatother
 
 % From https://tex.stackexchange.com/a/645996/211326
 %%% apa7 doesn't want to add appendix section titles in the toc
@@ -257,11 +267,9 @@ $if(first-page)$
 \setcounter{page}{$first-page$}
 $endif$
 
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{snugshade}\begin{singlespace}}{\end{singlespace}\end{snugshade}}\fi
-
 $if(journalmode)$
 $else$
-\setlength{\cslhangindent}{0.5in}
+\ifdefined\cslhangindent\setlength{\cslhangindent}{0.5in}\fi
 $endif$
 
 $body$

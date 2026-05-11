@@ -1,6 +1,17 @@
 ---
 title: "My Title"
 shorttitle: "Short Title in Running Header"
+supplementary-material: false
+# supplementary-float-prefix: true
+# supplementary-section-prefix: true
+# publication-statement:
+#   journal: Psychological Methods
+#   apa-year: 2026
+#   doi: "https://doi.org/10.1037/met0000846"
+# Add custom wording after the standard accepted-in-journal sentence:
+# publication-statement:
+#   journal: Psychological Methods
+#   statement: "Custom publication wording..."
 author:
   - name: Jane Doe
     corresponding: true
@@ -26,6 +37,7 @@ author-note:
     financial-support: ~
     gratitude: ~
     authorship-agreements: ~
+    ai-statement: ~
 abstract: "This document is a template."
 impact-statement: "This template helps you get started."
 keywords: [Keyword 1, Keyword 2, Keyword 3]

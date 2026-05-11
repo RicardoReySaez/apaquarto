@@ -130,6 +130,17 @@ return {
     Pandoc = function(doc)
       local body = List:new {}
       local meta = doc.meta
+      local function insert_page_break()
+        if FORMAT:match 'docx' then
+          body:extend({ pandoc.RawBlock('openxml', '<w:p><w:r><w:br w:type="page"/></w:r></w:p>') })
+        end
+        if FORMAT:match 'typst' then
+          body:extend({ pandoc.RawBlock('typst', '#pagebreak()\n\n') })
+        end
+        if FORMAT:match 'html' then
+          body:extend({ pandoc.RawBlock('html', '<div class="page-break"></div>') })
+        end
+      end
 
       local documenttitle = ""
       local intabovetitle = 2
@@ -163,8 +174,8 @@ return {
       local affiliations = meta["affiliations"]
 
       local authornote = false
-      if meta["author-note"] and not meta["suppress-author-note"] then
-        authornote = meta["author-note"]
+      if not meta["suppress-author-note"] then
+        authornote = meta["author-note"] or meta["author_note"] or meta["apa-ai-statement"]
       end
 
       local mask = false
@@ -252,6 +263,33 @@ return {
         body:extend({ draftdatediv })
       end
 
+      if meta.publicationstatement and not mask then
+        local publication_statement_div = pandoc.Div({
+          pandoc.Para(meta.publicationstatement)
+        })
+        publication_statement_div.classes:extend({ "NoIndent", "PublicationStatement" })
+        if FORMAT:match 'typst' then
+          body:extend({ pandoc.RawBlock('typst', '#v(1fr)\n\n') })
+        else
+          body:extend({ newline })
+        end
+        body:extend({ publication_statement_div })
+
+        if not meta["suppress-author-note"] and (byauthor or authornote) then
+          if FORMAT:match 'docx' then
+            body:extend({ pandoc.RawBlock('openxml', '<w:p><w:r><w:br w:type="page"/></w:r></w:p>') })
+          end
+
+          if FORMAT:match 'typst' then
+            body:extend({ pandoc.RawBlock('typst', '#pagebreak()\n\n') })
+          end
+
+          if FORMAT:match 'html' then
+            body:extend({ pandoc.RawBlock('html', '<div class="page-break"></div>') })
+          end
+        end
+      end
+
       local authornoteheadertext = "Author Note"
       if meta.language and meta.language["title-block-author-note"] then
         authornoteheadertext = meta.language["title-block-author-note"]
@@ -329,26 +367,30 @@ return {
           end
         end
 
-        if authornote.disclosures then
+        if authornote.disclosures or meta["apa-ai-statement"] then
           local third_paragraph = pandoc.Para(pandoc.Str(""))
+          local disclosures = authornote.disclosures or {}
 
           third_paragraph = extend_paragraph(third_paragraph,
-            authornote.disclosures["study-registration"] or authornote["study-registration"] or
+            disclosures["study-registration"] or authornote["study-registration"] or
             meta["study-registration"])
           third_paragraph = extend_paragraph(third_paragraph,
-            authornote.disclosures["data-sharing"] or authornote["data-sharing"] or meta["data-sharing"])
+            disclosures["data-sharing"] or authornote["data-sharing"] or meta["data-sharing"])
           third_paragraph = extend_paragraph(third_paragraph,
-            authornote.disclosures["related-report"] or authornote["related-report"] or meta["related-report"])
+            disclosures["related-report"] or authornote["related-report"] or meta["related-report"])
           third_paragraph = extend_paragraph(third_paragraph,
-            authornote.disclosures["conflict-of-interest"] or authornote["conflict-of-interest"] or
+            disclosures["conflict-of-interest"] or authornote["conflict-of-interest"] or
             meta["conflict-of-interest"])
           third_paragraph = extend_paragraph(third_paragraph,
-            authornote.disclosures["financial-support"] or authornote["financial-support"] or meta["financial-support"])
+            disclosures["financial-support"] or authornote["financial-support"] or meta["financial-support"])
           third_paragraph = extend_paragraph(third_paragraph,
-            authornote.disclosures.gratitude or authornote.gratitude or meta.gratitude)
+            disclosures.gratitude or authornote.gratitude or meta.gratitude)
           third_paragraph = extend_paragraph(third_paragraph,
-            authornote.disclosures["authorship-agreements"] or authornote["authorship-agreements"] or
+            disclosures["authorship-agreements"] or authornote["authorship-agreements"] or
             meta["authorship-agreements"])
+          third_paragraph = extend_paragraph(third_paragraph,
+            disclosures["ai-statement"] or disclosures["ai_statement"] or authornote["ai-statement"] or
+            authornote["ai_statement"] or meta["apa-ai-statement"])
 
           if #third_paragraph.content > 1 then
             if not mask and not meta["suppress-disclosures-paragraph"] then
@@ -392,7 +434,7 @@ return {
 
       if #credit_paragraph.content > 1 then
         local authorroleintroduction = pandoc.Str(
-        "Author roles were classified using the Contributor Role Taxonomy (CRediT; https://credit.niso.org/) as follows:")
+        "Author roles were classified using the Contributor Role Taxonomy (CRediT; <https://credit.niso.org/>) as follows:")
         if meta.language and meta.language["title-block-role-introduction"] then
           authorroleintroduction = meta.language["title-block-role-introduction"]
           if type(authorroleintroduction) == "string" then
@@ -411,8 +453,9 @@ return {
 
       local corresponding_paragraph = pandoc.Para(pandoc.Str(""))
       local check_corresponding = false
-      if meta["author-note"] and meta["author-note"]["correspondence-note"] then
-        corresponding_paragraph.content:extend(meta["author-note"]["correspondence-note"])
+      local rawauthornote = meta["author-note"] or meta["author_note"]
+      if rawauthornote and rawauthornote["correspondence-note"] then
+        corresponding_paragraph.content:extend(rawauthornote["correspondence-note"])
       else
         if byauthor then
           for i, a in ipairs(byauthor) do
@@ -562,24 +605,6 @@ return {
         end
       end
 
-      if meta["impact-statement"] and #meta["impact-statement"] > 0 and not meta["suppress-impact-statement"] then
-        local impactheadertext = pandoc.Str("Impact Statement")
-        if meta.language and meta.language["title-impact-statement"] then
-          impactheadertext = meta.language["title-impact-statement"]
-        end
-        local impactheader = pandoc.Header(1, impactheadertext)
-        impactheader.classes = { "unnumbered", "unlisted", "AuthorNote" }
-        impactheader.identifier = "impact"
-        body:extend({ impactheader })
-        local impact_paragraph = pandoc.Para(pandoc.Str(""))
-        if pandoc.utils.type(meta["impact-statement"]) == "Inlines" then
-          impact_paragraph.content:extend(meta["impact-statement"])
-          local impactdiv = pandoc.Div(impact_paragraph)
-          impactdiv.classes:insert("AbstractFirstParagraph")
-          body:extend({ impactdiv })
-        end
-      end
-
       if meta.keywords and not meta["suppress-keywords"] then
         local keywordsword = pandoc.Str("Keywords")
         if meta.language and meta.language["title-block-keywords"] then
@@ -612,6 +637,25 @@ return {
 
         local word_count_paragraph = pandoc.Para({ pandoc.Emph(word_count_word), pandoc.Str(": " .. meta.wordn) })
         body:extend({ word_count_paragraph })
+      end
+
+      if meta["impact-statement"] and #meta["impact-statement"] > 0 and not meta["suppress-impact-statement"] then
+        insert_page_break()
+        local impactheadertext = pandoc.Str("Translational Abstract")
+        if meta.language and meta.language["title-impact-statement"] then
+          impactheadertext = meta.language["title-impact-statement"]
+        end
+        local impactheader = pandoc.Header(1, impactheadertext)
+        impactheader.classes = { "unnumbered", "unlisted", "AuthorNote" }
+        impactheader.identifier = "impact"
+        body:extend({ impactheader })
+        local impact_paragraph = pandoc.Para(pandoc.Str(""))
+        if pandoc.utils.type(meta["impact-statement"]) == "Inlines" then
+          impact_paragraph.content:extend(meta["impact-statement"])
+          local impactdiv = pandoc.Div(impact_paragraph)
+          impactdiv.classes:insert("AbstractFirstParagraph")
+          body:extend({ impactdiv })
+        end
       end
 
       if FORMAT:match 'docx' then

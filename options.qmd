@@ -167,10 +167,42 @@ format:
 +------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | `no-ampersand-parenthetical` | APA style uses ampersands in parenthetical citations (e.g., Schneider & McGrew, 2018) but not in narrative (i.e., in-text) citations: Schneider and McGrew (2018). You can replace ampersands with "and" in parenthetical citations (e.g., Schneider and McGrew, 2018) by setting the `no-ampersand-parenthetical` option to `true`. A different replacement word other than "and" can be set in the `citation-last-author-separator` field in the `language` options. |
 +------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| `impact-statement`           | A paragraph below the Abstract that describes the theoretical/practical importance of the work. The heading of the impact statement is "Impact Statement" by default but can be overridden using the `title-impact-statement` field in the `language` field.                                                                                                                                                                                                           |
+| `impact-statement`           | A paragraph on a separate page after the Abstract that describes the theoretical/practical importance of the work. The heading of the impact statement is "Translational Abstract" by default but can be overridden using the `title-impact-statement` field in the `language` field.                                                                                                                                                                                   |
 +------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : {.primary tbl-colwidths="\[25,75\]"}
+
+Two additional title-page helpers are available:
+
+``` yaml
+supplementary-material: true
+```
+
+When `supplementary-material` (or `supplementary_material`) is `true`, the title page is labeled as supplementary material and the running head is set to "Supplementary Material".
+
+In supplementary material, the title is not repeated on the first manuscript page. Tables and figures are numbered with an `S` prefix by default (for example, Table S1 and Figure S1), and level-1 manuscript headings are prefixed as `SM1:`, `SM2:`, and so on. These defaults can be disabled:
+
+``` yaml
+supplementary-float-prefix: false
+supplementary-section-prefix: false
+```
+
+``` yaml
+publication-statement:
+  journal: Psychological Methods
+  apa-year: 2026
+  doi: "https://doi.org/10.1037/met0000846"
+```
+
+When `publication-statement` (or `publication_statement`) is supplied, the statement is placed at the bottom of the first title page. The `journal` field creates the standard accepted-in-journal sentence. Use `statement` to add custom wording immediately after that sentence. Use `apa-year` to add the standard APA notice; `year` is also supported for older documents. If `doi` is supplied without `apa-year`, it is added as a DOI hyperlink at the end.
+
+``` yaml
+publication-statement:
+  journal: Psychological Methods
+  statement: "Custom publication wording..."
+  apa-year: 2026
+  doi: "https://doi.org/10.1037/met0000846"
+```
 
 ## Authors
 
@@ -519,6 +551,16 @@ The third paragraph consists of study details and author disclosures:
 |                         |     authorship-agreements: "Because the authors are equal contributors, order of authorship was determined by a fair coin toss." |
 |                         | ```                                                                                                                              |
 +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+| `ai-statement`          | Disclose how artificial intelligence tools were used in the work.                                                                |
+|                         |                                                                                                                                  |
+|                         | Example:                                                                                                                         |
+|                         |                                                                                                                                  |
+|                         | ``` yaml                                                                                                                         |
+|                         | author-note:                                                                                                                     |
+|                         |   disclosures:                                                                                                                   |
+|                         |     ai-statement: "The authors used AI tools to improve grammar and clarity and reviewed all generated text."                    |
+|                         | ```                                                                                                                              |
++-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
 
 : {.primary tbl-colwidths="\[25,75\]"}
 
@@ -619,7 +661,7 @@ Any of the elements below can be selectively suppressed from the document.
 | `suppress-author-note: true` | Suppress the entire author note |
 | `suppress-orcid: true` | Suppress the author ORCID numbers |
 | `suppress-status-change-paragraph: true` | Suppress the paragraph about status changes (affiliation changes and deceased authors) |
-| `suppress-disclosures-paragraph: true` | Suppress the paragraph about disclosures (study registration, data sharing, related reports, conflicts of interest, financial support, statements of gratitude, and authorship agreements) |
+| `suppress-disclosures-paragraph: true` | Suppress the paragraph about disclosures (study registration, data sharing, related reports, conflicts of interest, financial support, statements of gratitude, authorship agreements, and AI statements) |
 | `suppress-credit-statement: true` | Suppress the credit statement |
 | `suppress-corresponding-paragraph: true` | Suppress the entire correspondence paragraph |
 | `suppress-corresponding-group: true` | Suppress the group in the correspondence address |
@@ -668,8 +710,8 @@ However, there are a few options that are specific to apaquarto and thus were no
 | `citation-masked-date` | The abbreviated translation for "no date" in masked citations | *n.d.* |
 | `title-block-author-note` | The heading of the author note | *Author Note* |
 | `title-block-correspondence-note` | The phrase introducing the correspondence note. | *Correspondence concerning this article should be addressed to* |
-| `title-block-role-introduction` | The phrase introducing the author roles. | *Author roles were classified using the Contributor Role Taxonomy (CRediT; https://credit.niso.org/) as follows:* |
-| `title-impact-statement` | The heading for the impact statement | *Impact Statement* |
+| `title-block-role-introduction` | The phrase introducing the author roles. | *Author roles were classified using the Contributor Role Taxonomy (CRediT; <https://credit.niso.org/>) as follows:* |
+| `title-impact-statement` | The heading for the impact statement | *Translational Abstract* |
 | `title-word-count` | The phrase before the word count when `word-count: true` | *Word Count* |
 | `references-meta-analysis` | The sentence explaining that citations marked with an asterisk were studies in the meta-analysis. | *References marked with an asterisk indicate studies included in the meta-analysis.* |
 
@@ -686,7 +728,7 @@ language:
   citation-masked-date: "n.f."
   title-block-author-note: "Nota de Autores"
   title-block-correspondence-note: "La correspondencia relativa a este artículo debe dirigirse a"
-  title-block-role-introduction: "Los roles de autor se clasificaron utilizando la taxonomía de roles de colaborador (CRediT; https://credit.niso.org/) de la siguiente manera:"
+  title-block-role-introduction: "Los roles de autor se clasificaron utilizando la taxonomía de roles de colaborador (CRediT; <https://credit.niso.org/>) de la siguiente manera:"
   references-meta-analysis: "Las referencias marcadas con un asterisco indican estudios incluidos en el metanálisis."
   title-impact-statement: "Declaración de Impacto"
   title-word-count: "Recuento de Palabras"
