@@ -69,7 +69,7 @@ the template to be installed (e.g., `setwd("path/to/my/folder")`) and
 then running this:
 
 ``` r
-quarto::quarto_use_template("wjschne/apaquarto")
+quarto::quarto_use_template("RicardoReySaez/apaquarto")
 ```
 
 A prompt will ask if you trust the author (me) not to run malicious
@@ -82,7 +82,7 @@ terminal. Navigate to the folder where you want to create your file
 (e.g., `cd path/to/my/folder`), and run this command:
 
 ``` bash
-quarto use template wjschne/apaquarto
+quarto use template RicardoReySaez/apaquarto
 ```
 
 In RStudio, the terminal is in a tab next to the console. If you cannot
@@ -136,7 +136,7 @@ directory to the same folder as the file (e.g.,
 Run this code in the console:
 
 ``` r
-quarto::quarto_use_template("wjschne/apaquarto")
+quarto::quarto_use_template("RicardoReySaez/apaquarto")
 ```
 
 ### Creating a New Document Via the Terminal
@@ -145,7 +145,7 @@ To add this format to an existing document, navigate to the folder where
 the existing .qmd you wish to use and then run:
 
 ``` bash
-quarto add wjschne/apaquarto
+quarto add RicardoReySaez/apaquarto
 ```
 
 ### Add apaquarto to the Document’s Metadata:
@@ -201,7 +201,7 @@ format:
 In the terminal, run
 
 ``` bash
-quarto update wjschne/apaquarto
+quarto update RicardoReySaez/apaquarto
 ```
 
 ## Removing apaquarto
@@ -209,5 +209,5 @@ quarto update wjschne/apaquarto
 In the terminal, run
 
 ``` bash
-quarto remove wjschne/apaquarto
+quarto remove RicardoReySaez/apaquarto
 ```
