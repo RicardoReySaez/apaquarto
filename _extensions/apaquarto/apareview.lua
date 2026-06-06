@@ -265,99 +265,127 @@ local function prepend_label(blocks, label_text)
   return blocks
 end
 
-function Div(div)
-  if not review_mode then
-    return nil
-  end
+--- Which kind of review block is this div, if any?
+local function classify(div)
+  if has_class(div, comment_classes) then return "comment" end
+  if has_class(div, response_classes) then return "response" end
+  if has_class(div, modification_classes) then return "modification" end
+  return nil
+end
 
-  local is_comment = has_class(div, comment_classes)
-  local is_response = has_class(div, response_classes)
-  local is_modification = has_class(div, modification_classes)
-  if not is_comment and not is_response and not is_modification then
-    return nil
-  end
-
-  local explicit_title = div_title(div)
-  local content = div.content
-
-  if explicit_title == nil then
-    if is_comment and meta_comment_label ~= "" then
-      comment_counter = comment_counter + 1
-      explicit_title = meta_comment_label .. " " .. tostring(comment_counter)
-    elseif is_response then
-      explicit_title = meta_response_label
-    elseif is_modification then
-      explicit_title = meta_modification_label
+--- Build a segment descriptor from a review div. Auto-numbers comment boxes.
+local function make_segment(div, kind)
+  local title = div_title(div)
+  if title == nil then
+    if kind == "comment" then
+      if meta_comment_label ~= "" then
+        comment_counter = comment_counter + 1
+        title = meta_comment_label .. " " .. tostring(comment_counter)
+      end
+    elseif kind == "response" then
+      title = meta_response_label
+    elseif kind == "modification" then
+      title = meta_modification_label
     end
   end
 
-  -- HTML: keep the div + classes, let CSS style it. Normalize the class so the
-  -- stylesheet only needs a few selectors, and inject the label as a heading.
-  if FORMAT:match("html") then
-    local variant = "review-comment"
-    if is_response then
-      variant = "review-response"
-    elseif is_modification then
-      variant = "review-modification"
-    end
-    local classes = { "review-block", variant }
-    local blocks = pandoc.List(content:clone())
-    if explicit_title then
-      local lbl = pandoc.Div(
-        pandoc.Plain(pandoc.Inlines({ pandoc.Str(explicit_title) })),
-        pandoc.Attr("", { "review-label" })
-      )
-      blocks:insert(1, lbl)
-    end
-    return pandoc.Div(blocks, pandoc.Attr("", classes))
+  local env, variant, style
+  if kind == "comment" then
+    env, variant, style = "reviewcommentbox", "review-comment", "ReviewerComment"
+  elseif kind == "response" then
+    env, variant, style = "reviewresponsebox", "review-response", "AuthorResponse"
+  else
+    env, variant, style = "reviewmodificationbox", "review-modification", "ManuscriptChange"
   end
 
-  -- LaTeX: wrap in the matching tcolorbox.
+  return {
+    kind = kind,
+    title = title,
+    content = pandoc.List(div.content:clone()),
+    env = env,
+    variant = variant,
+    style = style,
+  }
+end
+
+--- Render a whole exchange (one comment + its response/modification, etc.) as a
+--- single visual block: coloured stripes glued together, one per segment.
+local function render_group(segments)
+  local n = #segments
+
+  -- LaTeX: stack tcolorboxes; only the first/last segment keep outer spacing so
+  -- one exchange is separated from the next, while the stripes inside an
+  -- exchange read as a continuous box.
   if FORMAT:match("latex") then
-    local env = "reviewcommentbox"
-    if is_response then
-      env = "reviewresponsebox"
-    elseif is_modification then
-      env = "reviewmodificationbox"
+    local out = pandoc.List({})
+    -- Outer spacing (before the first / after the last segment) separates one
+    -- exchange from the next; inner segments carry no extra outer skip.
+    local function seg_opts(i)
+      local before = (i == 1) and "16pt" or "0pt"
+      local after = (i == n) and "16pt" or "0pt"
+      return "before skip=" .. before .. ", after skip=" .. after
     end
-    local open = "\\begin{" .. env .. "}"
-    local result = pandoc.List({ pandoc.RawBlock("latex", open) })
-    if explicit_title then
-      result:insert(pandoc.Para(pandoc.Inlines({
-        pandoc.Strong(pandoc.Inlines({ pandoc.Str(explicit_title .. ":") }))
-      })))
+    for i, seg in ipairs(segments) do
+      out:insert(pandoc.RawBlock("latex", "\\begin{" .. seg.env .. "}[" .. seg_opts(i) .. "]"))
+      if seg.title then
+        out:insert(pandoc.Para(pandoc.Inlines({
+          pandoc.Strong(pandoc.Inlines({ pandoc.Str(seg.title .. ":") }))
+        })))
+      end
+      out:extend(seg.content)
+      out:insert(pandoc.RawBlock("latex", "\\end{" .. seg.env .. "}"))
     end
-    result:extend(content)
-    result:insert(pandoc.RawBlock("latex", "\\end{" .. env .. "}"))
-    return result
+    return out
   end
 
-  -- docx: coloured box via a custom paragraph style added to the reference doc.
+  -- HTML: an outer container clips the stripes into one rounded box.
+  if FORMAT:match("html") then
+    local inner = pandoc.List({})
+    for _, seg in ipairs(segments) do
+      local blocks = pandoc.List(seg.content:clone())
+      if seg.title then
+        blocks:insert(1, pandoc.Div(
+          pandoc.Plain(pandoc.Inlines({ pandoc.Str(seg.title) })),
+          pandoc.Attr("", { "review-label" })
+        ))
+      end
+      inner:insert(pandoc.Div(blocks, pandoc.Attr("", { "review-block", seg.variant })))
+    end
+    return pandoc.List({ pandoc.Div(inner, pandoc.Attr("", { "review-exchange" })) })
+  end
+
+  -- docx: stacked styled paragraphs with no inter-segment spacing (set in the
+  -- styles), then a small spacer paragraph to separate this exchange from the
+  -- next one.
   if FORMAT:match("docx") then
-    local blocks = pandoc.List(content:clone())
-    if explicit_title then
-      blocks = prepend_label(blocks, explicit_title)
+    local out = pandoc.List({})
+    for _, seg in ipairs(segments) do
+      local blocks = pandoc.List(seg.content:clone())
+      if seg.title then
+        blocks = prepend_label(blocks, seg.title)
+      end
+      out:insert(pandoc.Div(blocks, pandoc.Attr("", {}, { ["custom-style"] = seg.style })))
     end
-    local style = "ReviewerComment"
-    if is_response then
-      style = "AuthorResponse"
-    elseif is_modification then
-      style = "ManuscriptChange"
-    end
-    return pandoc.Div(blocks, pandoc.Attr("", {}, { ["custom-style"] = style }))
+    out:insert(pandoc.RawBlock("openxml",
+      "<w:p><w:pPr><w:spacing w:before=\"0\" w:after=\"0\" w:line=\"280\" w:lineRule=\"exact\"/></w:pPr></w:p>"))
+    return out
   end
 
-  -- typst / other (no easy colour): distinguish by layout instead. Reviewer or
-  -- editor comments become an indented block quote; responses and manuscript
-  -- changes are normal text with a bold lead-in label.
-  local blocks = pandoc.List(content:clone())
-  if is_response or is_modification then
-    return prepend_label(blocks, explicit_title)
+  -- typst / other: no colour; distinguish by layout. Comments become an
+  -- indented block quote, responses/changes a bold lead-in paragraph.
+  local out = pandoc.List({})
+  for _, seg in ipairs(segments) do
+    local blocks = pandoc.List(seg.content:clone())
+    if seg.kind == "comment" then
+      if seg.title then
+        blocks = prepend_label(blocks, seg.title)
+      end
+      out:insert(pandoc.BlockQuote(blocks))
+    else
+      out:extend(prepend_label(blocks, seg.title))
+    end
   end
-  if explicit_title then
-    blocks = prepend_label(blocks, explicit_title)
-  end
-  return pandoc.BlockQuote(blocks)
+  return out
 end
 
 -- ---------------------------------------------------------------------------
@@ -370,11 +398,7 @@ local function docx_page_break()
     "<w:p><w:r><w:br w:type=\"page\"/></w:r></w:p>")
 end
 
-function Header(h)
-  if not review_mode then
-    return nil
-  end
-
+local function transform_header(h)
   -- Level-2 (and deeper) headers: user-defined sub-categories such as
   -- "Major comments" / "Minor comments". Give them a little extra breathing
   -- room above so they separate clearly from the preceding response block.
@@ -394,19 +418,19 @@ function Header(h)
         style = existing .. " " .. style
       end
       h.attributes["style"] = style
-      return h
+      return pandoc.List({ h })
     end
     if FORMAT:match("docx") then
-      return pandoc.Div(
+      return pandoc.List({ pandoc.Div(
         pandoc.Para(h.content),
         pandoc.Attr(h.identifier, {}, { ["custom-style"] = "ReviewSubHeading" })
-      )
+      ) })
     end
-    return nil
+    return pandoc.List({ h })
   end
 
   if h.level ~= 1 then
-    return nil
+    return pandoc.List({ h })
   end
 
   -- New editor/reviewer section: restart comment numbering at 1.
@@ -440,7 +464,7 @@ function Header(h)
     end
     h.attributes["style"] = style
     if not add_break then
-      return h
+      return pandoc.List({ h })
     end
     return pandoc.List({
       pandoc.RawBlock("html",
@@ -455,15 +479,64 @@ function Header(h)
       pandoc.Attr(h.identifier, {}, { ["custom-style"] = "ReviewSectionHeading" })
     )
     if not add_break then
-      return heading
+      return pandoc.List({ heading })
     end
     return pandoc.List({ docx_page_break(), heading })
   end
 
-  return nil
+  return pandoc.List({ h })
+end
+
+-- ---------------------------------------------------------------------------
+-- Document pass: walk the body in order, grouping each comment with the
+-- response/modification blocks that follow it (up to the next comment or
+-- heading) into a single rendered exchange.
+-- ---------------------------------------------------------------------------
+function Pandoc(doc)
+  if not review_mode then
+    return doc
+  end
+
+  local out = pandoc.List({})
+  local group = nil
+
+  local function flush()
+    if group and #group > 0 then
+      out:extend(render_group(group))
+    end
+    group = nil
+  end
+
+  for _, blk in ipairs(doc.blocks) do
+    local kind = (blk.t == "Div") and classify(blk) or nil
+    if blk.t == "Header" then
+      flush()
+      out:extend(transform_header(blk))
+    elseif kind ~= nil then
+      local seg = make_segment(blk, kind)
+      if kind == "comment" then
+        -- A new comment opens a new exchange.
+        flush()
+        group = pandoc.List({ seg })
+      else
+        -- Response / modification attach to the open exchange.
+        if not group then
+          group = pandoc.List({})
+        end
+        group:insert(seg)
+      end
+    else
+      flush()
+      out:insert(blk)
+    end
+  end
+  flush()
+
+  doc.blocks = out
+  return doc
 end
 
 return {
   { Meta = Meta },
-  { Div = Div, Header = Header }
+  { Pandoc = Pandoc }
 }

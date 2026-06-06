@@ -101,6 +101,18 @@ table {
   line-height: 1.4em;
 }
 .review-block p {text-indent: 0; line-height: 1.4em;}
+/* One exchange (comment + response + modification) as a single boxed unit:
+   the stripes are glued together and clipped into one rounded outer box. */
+.review-exchange {
+  margin: 1.5em 0;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.review-exchange .review-block {
+  margin: 0;
+  border-radius: 0;
+}
 .review-comment {
   background-color: #eaf1f8;
   border-left-color: #34618e;
