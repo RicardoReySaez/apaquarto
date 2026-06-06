@@ -93,6 +93,33 @@ table {
 
 .AbstractFirstParagraph p {text-indent: 0}
 
+/* Response-to-reviewers (document: review) blocks */
+.review-block {
+  margin: 0.75em 0;
+  padding: 0.5em 0.8em;
+  border-left: 3px solid;
+  line-height: 1.4em;
+}
+.review-block p {text-indent: 0; line-height: 1.4em;}
+.review-comment {
+  background-color: #eaf1f8;
+  border-left-color: #34618e;
+}
+.review-response {
+  background-color: #eaf3ec;
+  border-left-color: #3e7d54;
+}
+.review-modification {
+  background-color: #fbf1e6;
+  border-left-color: #b5732e;
+}
+.review-label {
+  font-weight: bold;
+  text-indent: 0;
+  margin-bottom: 0.2em;
+}
+.review-label p {text-indent: 0; margin: 0; font-weight: bold;}
+
 .sourceCode {
   font-family: Consolas, "Lucida Console", "Courier New", monospace;
   font-size: 10pt;

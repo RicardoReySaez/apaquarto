@@ -1,0 +1,112 @@
+---
+title: "My Title"
+shorttitle: "Response to Reviewers"
+# Turn this document into a response-to-reviewers letter:
+document: review
+# Optional overrides:
+# review-title: "Response to Reviewers"   # big heading on page 1
+# review-response-label: "Response"       # lead-in label inside .response blocks
+author:
+  - name: Jane Doe
+    corresponding: true
+    email: janedoe@generic.edu
+    affiliations:
+      - name: Generic University
+        department: Department of Scholarly Studies
+        city: New York
+        region: NY
+        country: USA
+abstract: ""
+bibliography: bibliography.bib
+format:
+  apaquarto-pdf: default
+  apaquarto-html: default
+  apaquarto-docx: default
+---
+
+We thank the Editor and the reviewers for their careful reading of our
+manuscript and for their constructive comments. Below we respond to each point
+in turn. Reviewer and editor comments are shown in blue boxes, our responses in
+green, and quoted changes to the revised manuscript in orange.
+
+# Editor
+
+::: {.editor}
+Thank you for submitting your manuscript. Both reviewers see merit in the work
+but raise several points that must be addressed before it can be accepted.
+:::
+
+::: {.response}
+We are grateful for the opportunity to revise our manuscript. We have addressed
+all of the points raised, as detailed below.
+:::
+
+# Associate Editor
+
+::: {.editor}
+Please pay particular attention to Reviewer 2's comment about the statistical
+analysis.
+:::
+
+::: {.response}
+We have revised the analysis accordingly; see our reply to Reviewer 2, Major
+comment 1.
+:::
+
+# Reviewer 1
+
+## Major comments
+
+::: {.reviewer}
+The theoretical framing in the Introduction could be clearer. It is not obvious
+how the second hypothesis follows from the literature reviewed.
+:::
+
+::: {.response}
+We have rewritten the final two paragraphs of the Introduction to make the
+derivation of Hypothesis 2 explicit (pp. 3--4). The revised passage now reads:
+:::
+
+::: {.modification}
+Building on this body of work, we therefore expected that participants in the
+high-load condition would show the opposite pattern (Hypothesis 2), because the
+mechanism outlined above predicts a reversal under cognitive load.
+:::
+
+## Minor comments
+
+::: {.reviewer}
+There is a typo on page 7, second paragraph.
+:::
+
+::: {.response}
+Corrected, thank you.
+:::
+
+---
+
+# Reviewer 2
+
+::: {.reviewer}
+The choice of statistical model is not justified. Why a linear model rather than
+a mixed-effects model given the nested data?
+:::
+
+::: {.response}
+This is an excellent point. We have re-run the analysis using a mixed-effects
+model with random intercepts for site (Results, p. 9). The substantive
+conclusions are unchanged.
+:::
+
+::: {.reviewer}
+The sample size justification is missing.
+:::
+
+::: {.response}
+We have added an a priori power analysis to the Method section (p. 6).
+:::
+
+# References
+
+::: {#refs}
+:::

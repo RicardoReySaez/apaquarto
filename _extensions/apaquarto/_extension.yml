@@ -102,6 +102,9 @@ contributes:
         # Formats title and authors
         - at: pre-quarto
           path: apastriptitle.lua
+        # Response-to-reviewers document type (document: review)
+        - at: pre-quarto
+          path: apareview.lua
         # Word count
         - at: pre-quarto
           path: wordcount.lua
