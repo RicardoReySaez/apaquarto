@@ -108,6 +108,10 @@ local function latex_preamble()
 \tcbuselibrary{skins,breakable}
 \usepackage{setspace}
 \AtBeginDocument{\singlespacing}
+% Disable vertical justification: apa7's \flushbottom stretches the (rigid)
+% boxes apart on box-heavy, under-full pages, blowing up the gaps between the
+% stripes of one exchange. \raggedbottom keeps those gaps small and uniform.
+\AtBeginDocument{\raggedbottom}
 % Reviewer/editor comments: understated blue. Author responses: green.
 % Manuscript changes / new text: muted orange.
 \definecolor{reviewbg}{HTML}{EAF1F8}
